@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>КАРКАС-01 — с авторизацией Firebase</title>
+<meta name="description" content="Голый каркас сайта с облачной авторизацией.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;700&family=Unbounded:wght@400;700;900&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   КАРКАС-01 · СТИЛИ (ПОЛНАЯ ВЕРСИЯ)
+   ============================================================ */
+:root{
+  --paper:#F1EFE7; --paper-2:#E9E6DA; --ink:#181611; --ink-2:#5B574B;
+  --line:#C9C4B4; --accent:#FF4A00; --blue:#2547E8; --green:#1E7A46; --red:#C22F2F;
+  --font-d:'Unbounded',sans-serif; --font-b:'IBM Plex Sans',sans-serif; --font-m:'JetBrains Mono',monospace;
+  --sheet:min(1200px,92vw); --nav-h:60px;
+}
+html[data-theme="dark"]{
+  --paper:#14130F; --paper-2:#1C1B15; --ink:#EAE6DA; --ink-2:#9B968A; --line:#34322A; --accent:#FF5A1A;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;color-scheme:light}
+html[data-theme="dark"]{color-scheme:dark}
+body{background:var(--paper);color:var(--ink);font:400 16px/1.6 var(--font-b);transition:background .35s,color .35s}
+::selection{background:var(--accent);color:#fff}
+a{color:inherit;text-decoration:none}
+ul,ol{list-style:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+img{max-width:100%;display:block}
+:focus-visible{outline:2px dashed var(--accent);outline-offset:3px}
+.mono{font-family:var(--font-m)}
+.wrap{width:var(--sheet);margin:0 auto}
+section[id]{scroll-margin-top:calc(var(--nav-h) + 28px)}
+
+.btn{display:inline-block;font:700 12px/1 var(--font-m);letter-spacing:.14em;text-transform:uppercase;padding:14px 20px;border:1px solid var(--ink);transition:transform .18s,box-shadow .18s,background .18s,color .18s,border-color .18s}
+.btn:hover{background:var(--accent);border-color:var(--accent);color:#fff;transform:translate(-2px,-2px);box-shadow:4px 4px 0 var(--ink)}
+.btn.primary{background:var(--ink);color:var(--paper)}
+.btn.primary:hover{background:var(--accent);color:#fff}
+.btn.ghost{border-style:dashed}
+.btn:disabled{opacity:.35;pointer-events:none}
+
+.titleblock{border-bottom:2px solid var(--ink);background:var(--paper)}
+.tb-grid{display:flex;flex-wrap:wrap}
+.tb-cell{flex:1 1 auto;padding:10px 16px;border-left:1px solid var(--line);font:400 10px/1.5 var(--font-m);letter-spacing:.14em;text-transform:uppercase}
+.tb-cell:first-child{border-left:0}
+.tb-cell b{display:block;font-size:12px;font-weight:700}
+.tb-cell .dot{display:inline-block;width:7px;height:7px;background:var(--green);margin-right:6px;animation:pulse 1.6s infinite}
+@keyframes pulse{50%{opacity:.25}}
+
+.nav{position:sticky;top:0;z-index:100;height:var(--nav-h);background:var(--paper);border-bottom:1px solid var(--ink)}
+.nav .wrap{height:100%;display:flex;align-items:center;gap:20px}
+.brand{display:flex;align-items:center;gap:10px;font:900 15px var(--font-d);letter-spacing:.04em}
+.brand .mark{width:30px;height:30px;background:var(--ink);color:var(--paper);display:grid;place-items:center;font:700 11px var(--font-m)}
+#navLinks{display:flex;gap:4px;margin-right:auto;overflow-x:auto}
+#navLinks a{font:700 11px/1 var(--font-m);letter-spacing:.12em;text-transform:uppercase;padding:10px 12px;white-space:nowrap;position:relative;color:var(--ink-2);transition:color .2s}
+#navLinks a::after{content:'';position:absolute;left:12px;right:12px;bottom:4px;height:2px;background:var(--accent);transform:scaleX(0);transform-origin:left;transition:transform .25s}
+#navLinks a:hover,#navLinks a.active{color:var(--ink)}
+#navLinks a.active::after{transform:scaleX(1)}
+.ctl{font:700 10px/1 var(--font-m);letter-spacing:.12em;border:1px solid var(--line);padding:9px 10px;color:var(--ink-2);transition:.2s}
+.ctl:hover{border-color:var(--ink);color:var(--ink)}
+.ctl.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.nav-controls{display:flex;gap:6px}
+
+.auth-box{display:flex;gap:6px;align-items:center}
+.auth-cta{border-color:var(--accent);color:var(--accent)}
+.auth-cta:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+.user-chip{display:inline-flex;align-items:center;gap:8px;max-width:170px;font:700 11px var(--font-m);letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--green);color:var(--green);padding:9px 10px}
+.user-chip b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.user-chip::before{content:'';width:7px;height:7px;background:var(--green);animation:pulse 1.6s infinite;flex:0 0 auto}
+
+.sec{padding:88px 0;border-bottom:1px solid var(--line)}
+.sec-head{display:grid;grid-template-columns:auto 1fr auto;gap:18px;align-items:baseline;border-top:2px solid var(--ink);padding-top:18px;margin-bottom:48px}
+.sec-index{font:700 13px var(--font-m);color:var(--accent);letter-spacing:.14em}
+.sec-title{font:700 clamp(26px,4.5vw,52px)/1.05 var(--font-d)}
+.sec-meta{font:400 10px var(--font-m);letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2)}
+
+.hero{position:relative;padding:96px 0 80px;border-bottom:1px solid var(--ink);overflow:hidden}
+.hero-grid{display:grid;grid-template-columns:1fr 320px;gap:56px;align-items:start;position:relative}
+.hero-kicker{font:700 11px var(--font-m);letter-spacing:.3em;text-transform:uppercase;color:var(--accent);margin-bottom:20px}
+.hero-title{font:900 clamp(52px,12.5vw,168px)/0.95 var(--font-d);letter-spacing:.01em}
+.dim{position:relative;margin:26px 0 30px;border-top:1px solid var(--ink-2)}
+.dim::before,.dim::after{content:'';position:absolute;top:-6px;width:1px;height:13px;background:var(--ink-2)}
+.dim::before{left:0}.dim::after{right:0}
+.dim-label{position:absolute;left:50%;top:-9px;transform:translateX(-50%);background:var(--paper);padding:0 12px;font-size:10px;letter-spacing:.2em;color:var(--ink-2);text-transform:uppercase}
+.hero-sub{max-width:56ch;color:var(--ink-2);margin-bottom:32px}
+.hero-cta{display:flex;gap:12px;flex-wrap:wrap}
+.hero-spec{border:1px solid var(--ink);padding:22px}
+.hero-spec h3{font:700 10px var(--font-m);letter-spacing:.24em;text-transform:uppercase;color:var(--ink-2);margin-bottom:14px}
+.spec-row{display:flex;justify-content:space-between;align-items:baseline;padding:12px 0;border-top:1px dashed var(--line)}
+.spec-row:first-of-type{border-top:0}
+.spec-row span{font:400 11px var(--font-m);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2)}
+.spec-row b{font:900 30px var(--font-d);color:var(--accent)}
+.stamp{position:absolute;right:-8px;top:-56px;transform:rotate(-7deg);border:2px solid var(--accent);color:var(--accent);font:700 10px/1.8 var(--font-m);letter-spacing:.22em;text-transform:uppercase;padding:10px 14px;text-align:center;opacity:.9;pointer-events:none}
+.plus{position:absolute;font:400 16px var(--font-m);color:var(--ink-2);opacity:.6;pointer-events:none}
+
+.ticker{border-bottom:1px solid var(--ink);background:var(--paper-2);overflow:hidden}
+.ticker-track{display:flex;width:max-content;animation:tick 30s linear infinite}
+.ticker:hover .ticker-track{animation-play-state:paused}
+.ticker span{font:400 11px var(--font-m);letter-spacing:.22em;text-transform:uppercase;padding:13px 0;white-space:nowrap}
+.ticker b{color:var(--accent);padding:0 14px;font-weight:400}
+@keyframes tick{to{transform:translateX(-50%)}}
+
+.anatomy-grid{display:grid;grid-template-columns:360px 1fr;gap:56px;align-items:start}
+.anatomy-side{position:sticky;top:calc(var(--nav-h) + 28px)}
+.anatomy-side p{color:var(--ink-2);margin-bottom:22px}
+.layer{width:100%;text-align:left;display:grid;grid-template-columns:44px 130px 1fr;gap:14px;align-items:baseline;padding:18px 14px;border:1px solid var(--line);border-bottom:0;position:relative;transition:background .2s;cursor:crosshair}
+.layer:last-child{border-bottom:1px solid var(--line)}
+.layer::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent);transform:scaleY(0);transition:transform .25s}
+.layer:hover,.layer:focus-visible{background:var(--paper-2)}
+.layer:hover::before,.layer:focus-visible::before{transform:scaleY(1)}
+.layer .n{font:700 11px var(--font-m);color:var(--accent)}
+.layer .tag{font:700 13px var(--font-m)}
+.layer .d{font-size:13px;color:var(--ink-2)}
+
+.tokens-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:32px}
+.plate{border:1px solid var(--ink)}
+.plate > h3{font:700 10px var(--font-m);letter-spacing:.24em;text-transform:uppercase;padding:12px 16px;border-bottom:1px solid var(--ink);background:var(--paper-2)}
+.plate-body{padding:16px}
+.swatch{width:100%;text-align:left;border:0;padding:0;cursor:copy}
+.swatch .chip{height:84px;background:var(--c);border:1px solid var(--line);transition:transform .2s}
+.swatch:hover .chip{transform:translateY(-3px)}
+.swatch .name{display:flex;justify-content:space-between;font:700 10px var(--font-m);letter-spacing:.12em;padding:8px 2px;text-transform:uppercase}
+.swatch .name i{font-style:normal;color:var(--ink-2)}
+.swatches{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.type-row{display:flex;justify-content:space-between;align-items:baseline;gap:14px;padding:10px 0;border-bottom:1px dashed var(--line)}
+.type-row:last-child{border:0}
+.type-row .lbl{font:400 10px var(--font-m);color:var(--ink-2);letter-spacing:.1em;flex:0 0 52px}
+.scale-row{display:flex;align-items:center;gap:12px;padding:7px 0}
+.scale-row .bar{height:14px;background:var(--ink)}
+.scale-row:hover .bar{background:var(--accent)}
+.scale-row .v{font:700 10px var(--font-m);color:var(--ink-2)}
+
+.pg-controls{display:flex;gap:36px;flex-wrap:wrap;align-items:end;margin-bottom:28px}
+.pg-controls label{display:block;font:700 10px var(--font-m);letter-spacing:.2em;text-transform:uppercase;color:var(--ink-2);margin-bottom:10px}
+input[type=range]{appearance:none;width:200px;height:2px;background:var(--ink);cursor:ew-resize}
+input[type=range]::-webkit-slider-thumb{appearance:none;width:16px;height:16px;background:var(--accent);border:2px solid var(--ink)}
+input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:0;background:var(--accent);border:2px solid var(--ink)}
+#stageOut{font:700 12px var(--font-m);letter-spacing:.16em;color:var(--accent)}
+#stage{display:grid}
+#stage .col{min-height:140px;border:1px dashed var(--ink-2);display:grid;place-items:center;font:700 13px var(--font-m);color:var(--ink-2);background:var(--paper-2);animation:colIn .4s both;transition:background .2s,color .2s}
+#stage .col:hover{background:var(--accent);color:#fff;border-style:solid;border-color:var(--accent)}
+@keyframes colIn{from{opacity:0;transform:translateY(14px)}}
+
+.comp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.comp .plate-body{display:flex;flex-direction:column;gap:14px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.field label{display:block;font:700 10px var(--font-m);letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2);margin-bottom:6px}
+.field input,.field select{width:100%;background:transparent;border:1px solid var(--line);color:var(--ink);padding:12px 14px;font:400 14px var(--font-b);transition:border-color .2s,box-shadow .2s}
+.field input:focus,.field select:focus{outline:none;border-color:var(--accent);box-shadow:3px 3px 0 color-mix(in srgb,var(--accent) 30%,transparent)}
+.field input.err-input{border-color:var(--red)}
+.field input.err-input:focus{box-shadow:3px 3px 0 color-mix(in srgb,var(--red) 30%,transparent)}
+.switch{display:flex;align-items:center;gap:10px;font:400 11px var(--font-m);letter-spacing:.1em;text-transform:uppercase;cursor:pointer}
+.switch input{appearance:none;width:44px;height:22px;border:1px solid var(--ink);position:relative;cursor:pointer;transition:background .2s;flex:0 0 auto}
+.switch input::before{content:'';position:absolute;left:2px;top:2px;width:16px;height:16px;background:var(--ink);transition:transform .2s,background .2s}
+.switch input:checked{background:var(--accent);border-color:var(--accent)}
+.switch input:checked::before{transform:translateX(22px);background:#fff}
+.check-row{display:flex;gap:18px;font:400 12px var(--font-b)}
+.check-row label{display:flex;gap:8px;align-items:center;cursor:pointer}
+.check-row input{accent-color:var(--accent);width:16px;height:16px}
+.tagc{display:inline-block;font:700 9px var(--font-m);letter-spacing:.14em;text-transform:uppercase;border:1px solid currentColor;padding:4px 8px}
+.tagc.ok{color:var(--green)} .tagc.warn{color:var(--accent)} .tagc.err{color:var(--red)} .tagc.info{color:var(--blue)}
+.bar-track{height:8px;border:1px solid var(--ink)}
+.bar-track i{display:block;height:100%;width:30%;background:var(--accent);animation:grow 3.2s ease-in-out infinite alternate}
+@keyframes grow{to{width:84%}}
+.alert{border:1px solid var(--line);border-left:4px solid var(--accent);padding:14px 16px;font-size:13px}
+.alert b{display:block;font:700 10px var(--font-m);letter-spacing:.2em;text-transform:uppercase;margin-bottom:6px;color:var(--accent)}
+.def .dr{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px dashed var(--line);font-size:13px}
+.def .dr:last-child{border:0}
+.def .dr span{font:400 10px var(--font-m);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2)}
+
+.mod-grid{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start}
+.mod{display:grid;grid-template-columns:130px 1fr auto;gap:14px;align-items:baseline;padding:13px 4px;border-bottom:1px solid var(--line)}
+.mod .mn{font:700 13px var(--font-m)}
+.mod .md{font-size:13px;color:var(--ink-2)}
+.mod .st{display:flex;align-items:center;gap:6px;font:700 9px var(--font-m);letter-spacing:.16em;color:var(--green)}
+.mod .st::before{content:'';width:6px;height:6px;background:var(--green);animation:pulse 1.8s infinite}
+.term{background:#12110D;border:1px solid var(--ink);color:#E8E4D8}
+.term-head{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid #34322A;font:700 10px var(--font-m);letter-spacing:.2em;text-transform:uppercase}
+.term-head .dot{width:8px;height:8px;background:var(--accent);animation:pulse 1.4s infinite}
+.term-head .cnt{margin-left:auto;color:#8B8577}
+.term-body{display:flex;flex-direction:column;gap:14px;padding:16px}
+#busLog{max-height:240px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;font:400 11px/1.5 var(--font-m)}
+#busLog li{display:flex;gap:12px;animation:logIn .3s both}
+@keyframes logIn{from{opacity:0;transform:translateX(-8px)}}
+#busLog .t{color:#8B8577;flex:0 0 auto}
+#busLog .m.ok{color:#7DDB8A} #busLog .m.sys{color:#E8E4D8}
+.term-actions{display:flex;gap:8px}
+.term-actions .btn{border-color:#5B574B;color:#E8E4D8;padding:10px 14px}
+.term-actions .btn:hover{box-shadow:4px 4px 0 #000}
+.term-hint{font-size:10px;color:#8B8577;letter-spacing:.08em}
+
+.timeline{border-left:2px solid var(--ink);margin-left:8px}
+.tl-item{position:relative;padding:0 0 40px 36px}
+.tl-item::before{content:'';position:absolute;left:-7px;top:6px;width:12px;height:12px;background:var(--paper);border:2px solid var(--accent)}
+.tl-item:hover::before{background:var(--accent)}
+.tl-ver{font:900 18px var(--font-d);color:var(--accent)}
+.tl-date{font:400 10px var(--font-m);letter-spacing:.2em;color:var(--ink-2);margin:4px 0 8px;text-transform:uppercase}
+.tl-item p{max-width:60ch;color:var(--ink-2);font-size:14px}
+
+.foot{padding:72px 0 0}
+.foot-word{font:900 clamp(48px,11vw,150px)/1 var(--font-d);color:transparent;-webkit-text-stroke:1.5px var(--ink);user-select:none;margin-bottom:48px}
+.foot-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;padding-bottom:48px}
+.foot-grid h4{font:700 10px var(--font-m);letter-spacing:.24em;text-transform:uppercase;color:var(--accent);margin-bottom:14px}
+.foot-grid li{padding:5px 0;font-size:13px;color:var(--ink-2)}
+.foot-grid a:hover{color:var(--accent)}
+.foot-bar{border-top:1px solid var(--ink);padding:18px 0;display:flex;gap:20px;align-items:center;font:400 10px var(--font-m);letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2)}
+.foot-bar .btn{margin-left:auto;padding:10px 14px}
+
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1);transition-delay:calc(var(--i,0)*70ms)}
+.reveal.in{opacity:1;transform:none}
+
+/* МОДАЛЬНОЕ ОКНО АВТОРИЗАЦИИ */
+.modal{position:fixed;inset:0;z-index:300;display:grid;place-items:center;padding:20px}
+.modal[hidden]{display:none}
+.modal-backdrop{position:absolute;inset:0;background:color-mix(in srgb,var(--ink) 62%,transparent)}
+.modal-plate{position:relative;width:min(430px,100%);background:var(--paper);border:2px solid var(--ink);box-shadow:10px 10px 0 color-mix(in srgb,var(--accent) 35%,transparent);animation:modalIn .25s cubic-bezier(.2,.7,.2,1)}
+@keyframes modalIn{from{opacity:0;transform:translateY(18px)}}
+.modal-head{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:2px solid var(--ink);background:var(--paper-2);font:700 10px var(--font-m);letter-spacing:.24em;text-transform:uppercase}
+.modal-x{font-size:14px;color:var(--ink-2);padding:4px}.modal-x:hover{color:var(--accent)}
+.modal-tabs{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--line)}
+.tab{padding:12px;font:700 11px var(--font-m);letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2);border-bottom:2px solid transparent;margin-bottom:-1px;transition:.2s}
+.tab:hover{color:var(--ink)}.tab.on{color:var(--ink);border-bottom-color:var(--accent)}
+#authForm{padding:20px 16px;display:flex;flex-direction:column;gap:16px}
+.ferr{color:var(--red);font:700 11px/1.4 var(--font-m);margin-top:6px}
+.pass-wrap{position:relative}
+.pass-wrap input{padding-right:44px}
+.pass-eye{position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:14px;color:var(--ink-2);padding:4px}
+.pass-eye:hover,.pass-eye.on{color:var(--accent)}
+.submit{width:100%}
+.form-msg{font-size:11px;letter-spacing:.08em;text-align:center;padding:10px;border:1px dashed var(--line)}
+.form-msg.ok{color:var(--green);border-color:var(--green)}.form-msg.bad{color:var(--red);border-color:var(--red)}
+.modal-note{padding:12px 16px;border-top:1px dashed var(--line);font-size:10px;color:var(--ink-2);letter-spacing:.06em}
+
+[data-xray]{position:relative}
+body.xray [data-xray]{outline:1px dashed color-mix(in srgb,var(--accent) 60%,transparent);outline-offset:-1px}
+body.xray [data-xray]::after{content:attr(data-xray);position:absolute;right:6px;bottom:6px;z-index:70;font:700 9px var(--font-m);letter-spacing:.14em;text-transform:uppercase;color:var(--accent);pointer-events:none}
+[data-xray].xr-hover{outline:2px solid var(--accent);outline-offset:-2px;z-index:5}
+[data-xray].xr-hover::before{content:attr(data-xray);position:absolute;left:0;top:0;z-index:80;background:var(--accent);color:#fff;font:700 10px var(--font-m);letter-spacing:.14em;text-transform:uppercase;padding:6px 10px;white-space:nowrap}
+
+.sheetgrid{position:fixed;inset:0;z-index:60;display:none;pointer-events:none}
+body.show-grid .sheetgrid{display:block}
+.sheetgrid .wrap{height:100%;display:grid;grid-template-columns:repeat(12,1fr)}
+.sheetgrid .wrap i{border-right:1px solid color-mix(in srgb,var(--accent) 22%,transparent);background:color-mix(in srgb,var(--accent) 4%,transparent)}
+.sheetgrid .wrap i:first-child{border-left:1px solid color-mix(in srgb,var(--accent) 22%,transparent)}
+
+.noise{position:fixed;inset:0;z-index:200;pointer-events:none;opacity:.05;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E")}
+#coords{position:fixed;left:14px;bottom:12px;z-index:120;font:700 10px var(--font-m);letter-spacing:.16em;color:var(--ink-2);opacity:.75;pointer-events:none}
+#toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);z-index:320;background:var(--ink);color:var(--paper);font:700 11px var(--font-m);letter-spacing:.14em;padding:12px 18px;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+
+@media (max-width:1100px){.tb-cell:nth-child(4){display:none}}
+@media (max-width:980px){.hero-grid,.anatomy-grid,.mod-grid{grid-template-columns:1fr}.anatomy-side{position:static}.tokens-grid,.comp-grid,.foot-grid{grid-template-columns:1fr 1fr}.stamp,.plus{display:none}}
+@media (max-width:640px){.tokens-grid,.comp-grid,.foot-grid{grid-template-columns:1fr}.sec-head{grid-template-columns:auto 1fr}.sec-meta{display:none}.layer{grid-template-columns:36px 1fr}.layer .d{grid-column:2}#coords{display:none}}
+@media (hover:none){#coords{display:none}}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}.reveal{opacity:1;transform:none}.ticker-track{animation:none;flex-wrap:wrap;width:auto}}
+</style>
+</head>
+<body>
+
+<div class="noise" aria-hidden="true"></div>
+
+<header class="titleblock" id="passport" data-xray="ПАСПОРТ · header">
+  <div class="wrap tb-grid">
+    <div class="tb-cell">Проект <b>КАРКАС-01</b></div>
+    <div class="tb-cell">Версия <b>0.5.0 (Firebase)</b></div>
+    <div class="tb-cell">Масштаб <b>1 : 1</b></div>
+    <div class="tb-cell">Лист <b>01 / 01</b></div>
+    <div class="tb-cell">Дата <b id="clock">—</b></div>
+    <div class="tb-cell">Оператор <b id="operator">—</b></div>
+    <div class="tb-cell">Статус <b><span class="dot"></span>СБОРКА АКТИВНА</b></div>
+  </div>
+</header>
+
+<nav class="nav" id="nav" data-xray="НАВИГАЦИЯ · nav" aria-label="Основная навигация">
+  <div class="wrap">
+    <a class="brand" href="#top"><span class="mark">К1</span>КАРКАС</a>
+    <div id="navLinks">
+      <a href="#anatomy">01 Анатомия</a>
+      <a href="#tokens">02 Токены</a>
+      <a href="#gridlab">03 Сетка</a>
+      <a href="#components">04 Компоненты</a>
+      <a href="#modules">05 Модули</a>
+      <a href="#log">06 Журнал</a>
+    </div>
+    <div class="auth-box" id="authBox">
+      <button class="ctl auth-cta" id="authOpen">Войти</button>
+      <span class="user-chip" id="userChip" hidden><b id="userName"></b></span>
+      <button class="ctl" id="authLogout" hidden>Выйти</button>
+    </div>
+    <div class="nav-controls">
+      <button class="ctl" id="ctlTheme" aria-pressed="false" title="Тема (T)">ТЕМА</button>
+      <button class="ctl" id="ctlXray" aria-pressed="false" title="Рентген (X)">РЕНТГЕН</button>
+      <button class="ctl" id="ctlGrid" aria-pressed="false" title="Модульная сетка (G)">СЕТКА</button>
+    </div>
+  </div>
+</nav>
+
+<main id="main" data-xray="ОСНОВА · main">
+  <section class="hero" id="top" data-xray="ПЕРВЫЙ ЭКРАН · section">
+    <span class="plus" style="left:6%;top:36px">+</span>
+    <span class="plus" style="right:10%;bottom:30px">+</span>
+    <div class="wrap hero-grid">
+      <div class="hero-main">
+        <p class="hero-kicker reveal">Заготовка сайта · без зависимостей · один файл</p>
+        <h1 class="hero-title" data-scramble>КАРКАС</h1>
+        <div class="dim" aria-hidden="true"><span class="dim-label mono">← ширина листа →</span></div>
+        <p class="hero-sub reveal" style="--i:1">Голый каркас будущего сайта: семантическая разметка, дизайн-токены, модульная сетка и модули на чистом JavaScript. Теперь с настоящей облачной авторизацией через Firebase.</p>
+        <div class="hero-cta reveal" style="--i:2">
+          <button class="btn primary" id="heroXray">Рентген структуры</button>
+          <button class="btn ghost" id="heroAuth">Открыть форму входа</button>
+        </div>
+      </div>
+      <aside class="hero-spec reveal" style="--i:3">
+        <div class="stamp" aria-hidden="true">Каркас-01 ★<br>утверждаю<br>★ 2026 ★</div>
+        <h3>Спецификация</h3>
+        <div class="spec-row"><span>Файлов</span><b class="count" data-to="1" data-pad="2">00</b></div>
+        <div class="spec-row"><span>Зависимостей</span><b class="count" data-to="0" data-pad="2">00</b></div>
+        <div class="spec-row"><span>Секций</span><b class="count" data-to="6" data-pad="2">00</b></div>
+        <div class="spec-row"><span>Рукописный код, %</span><b class="count" data-to="100">0</b></div>
+      </aside>
+    </div>
+  </section>
+
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker-track">
+      <span>HTML5<b>◆</b>CSS-переменные<b>◆</b>Vanilla JS<b>◆</b>Firebase Auth<b>◆</b>Подтверждение Email<b>◆</b>Облачная база<b>◆</b>Семантика<b>◆</b>12 колонок<b>◆</b></span>
+      <span>HTML5<b>◆</b>CSS-переменные<b>◆</b>Vanilla JS<b>◆</b>Firebase Auth<b>◆</b>Подтверждение Email<b>◆</b>Облачная база<b>◆</b>Семантика<b>◆</b>12 колонок<b>◆</b></span>
+    </div>
+  </div>
+
+  <section class="sec" id="anatomy" data-xray="СЕКЦИЯ 01 · section">
+    <div class="wrap">
+      <header class="sec-head">
+        <span class="sec-index">01</span>
+        <h2 class="sec-title" data-scramble>Анатомия страницы</h2>
+        <span class="sec-meta">header · nav · main · section · footer</span>
+      </header>
+      <div class="anatomy-grid">
+        <div class="anatomy-side reveal">
+          <p>Каркас собран из пяти несущих слоёв. Наведите курсор на строку — страница подсветит соответствующий элемент прямо на себе. Кнопка «Рентген» включает постоянную разметку всех слоёв.</p>
+          <button class="btn" id="anatomyXray">Включить рентген</button>
+        </div>
+        <div class="reveal" style="--i:1">
+          <button class="layer" data-target="#passport"><span class="n">01</span><span class="tag">&lt;header&gt;</span><span class="d">Паспорт чертежа: проект, версия, живые часы, оператор, статус сборки.</span></button>
+          <button class="layer" data-target="#nav"><span class="n">02</span><span class="tag">&lt;nav&gt;</span><span class="d">Липкая навигация с якорями, скаут-подсветкой активной секции и пультами управления.</span></button>
+          <button class="layer" data-target="#main"><span class="n">03</span><span class="tag">&lt;main&gt;</span><span class="d">Основа: весь контент страницы, каждая секция — независимый блок.</span></button>
+          <button class="layer" data-target="#gridlab"><span class="n">04</span><span class="tag">&lt;section&gt;</span><span class="d">Секция как модуль: заголовок, индекс, мета и собственный макет.</span></button>
+          <button class="layer" data-target="#foot"><span class="n">05</span><span class="tag">&lt;footer&gt;</span><span class="d">Подвал: карта, клавиши, колофон и служебная строка.</span></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="tokens" data-xray="СЕКЦИЯ 02 · section">
+    <div class="wrap">
+      <header class="sec-head">
+        <span class="sec-index">02</span>
+        <h2 class="sec-title" data-scramble>Дизайн-токены</h2>
+        <span class="sec-meta">клик по образцу копирует значение</span>
+      </header>
+      <div class="tokens-grid">
+        <div class="plate reveal">
+          <h3>Цвет</h3>
+          <div class="plate-body swatches">
+            <button class="swatch" data-hex="#F1EFE7"><span class="chip" style="--c:#F1EFE7"></span><span class="name">Бумага <i>#F1EFE7</i></span></button>
+            <button class="swatch" data-hex="#181611"><span class="chip" style="--c:#181611"></span><span class="name">Тушь <i>#181611</i></span></button>
+            <button class="swatch" data-hex="#FF4A00"><span class="chip" style="--c:#FF4A00"></span><span class="name">Сигнал <i>#FF4A00</i></span></button>
+            <button class="swatch" data-hex="#2547E8"><span class="chip" style="--c:#2547E8"></span><span class="name">Кобальт <i>#2547E8</i></span></button>
+            <button class="swatch" data-hex="#C9C4B4"><span class="chip" style="--c:#C9C4B4"></span><span class="name">Линия <i>#C9C4B4</i></span></button>
+            <button class="swatch" data-hex="#5B574B"><span class="chip" style="--c:#5B574B"></span><span class="name">Графит <i>#5B574B</i></span></button>
+          </div>
+        </div>
+        <div class="plate reveal" style="--i:1">
+          <h3>Типографика</h3>
+          <div class="plate-body">
+            <div class="type-row"><span class="lbl">96 / 900</span><span style="font:900 40px/1 var(--font-d)">Аа</span></div>
+            <div class="type-row"><span class="lbl">56 / 900</span><span style="font:900 30px/1 var(--font-d)">Аа</span></div>
+            <div class="type-row"><span class="lbl">32 / 700</span><span style="font:700 24px/1 var(--font-d)">Аа</span></div>
+            <div class="type-row"><span class="lbl">16 / 400</span><span style="font:400 16px var(--font-b)">Основной текст</span></div>
+            <div class="type-row"><span class="lbl">12 / mono</span><span class="mono" style="font-size:12px">служебная строка_01</span></div>
+          </div>
+        </div>
+        <div class="plate reveal" style="--i:2">
+          <h3>Шаг · отступы</h3>
+          <div class="plate-body">
+            <div class="scale-row"><span class="bar" style="width:4px"></span><span class="v">4</span></div>
+            <div class="scale-row"><span class="bar" style="width:8px"></span><span class="v">8</span></div>
+            <div class="scale-row"><span class="bar" style="width:16px"></span><span class="v">16</span></div>
+            <div class="scale-row"><span class="bar" style="width:24px"></span><span class="v">24</span></div>
+            <div class="scale-row"><span class="bar" style="width:32px"></span><span class="v">32</span></div>
+            <div class="scale-row"><span class="bar" style="width:48px"></span><span class="v">48</span></div>
+            <div class="scale-row"><span class="bar" style="width:64px"></span><span class="v">64</span></div>
+            <div class="scale-row"><span class="bar" style="width:96px"></span><span class="v">96</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="gridlab" data-xray="СЕКЦИЯ 03 · section">
+    <div class="wrap">
+      <header class="sec-head">
+        <span class="sec-index">03</span>
+        <h2 class="sec-title" data-scramble>Полигон сетки</h2>
+        <span class="sec-meta">css grid · интерактивно</span>
+      </header>
+      <div class="pg-controls reveal">
+        <div><label for="cols">Колонки</label><input type="range" id="cols" min="1" max="12" value="12"></div>
+        <div><label for="gap">Отступ</label><input type="range" id="gap" min="0" max="48" step="4" value="24"></div>
+        <output id="stageOut" for="cols gap">—</output>
+      </div>
+      <div id="stage" class="reveal" style="--i:1" aria-label="Демонстрация модульной сетки"></div>
+    </div>
+  </section>
+
+  <section class="sec" id="components" data-xray="СЕКЦИЯ 04 · section">
+    <div class="wrap">
+      <header class="sec-head">
+        <span class="sec-index">04</span>
+        <h2 class="sec-title" data-scramble>Инвентарь компонентов</h2>
+        <span class="sec-meta">6 пластин · готовые состояния</span>
+      </header>
+      <div class="comp-grid">
+        <div class="plate comp reveal"><h3>Кнопки</h3>
+          <div class="plate-body">
+            <div class="row"><button class="btn primary">Основная</button><button class="btn">Вторичная</button><button class="btn ghost">Контур</button><button class="btn" disabled>Недоступна</button></div>
+          </div>
+        </div>
+        <div class="plate comp reveal" style="--i:1"><h3>Поля ввода</h3>
+          <div class="plate-body">
+            <div class="field"><label for="f1">Название проекта</label><input id="f1" type="text" placeholder="Например: Каркас-02"></div>
+            <div class="field"><label for="f2">Тип листа</label><select id="f2"><option>А4 · вертикальный</option><option>А3 · горизонтальный</option></select></div>
+          </div>
+        </div>
+        <div class="plate comp reveal" style="--i:2"><h3>Переключатели</h3>
+          <div class="plate-body">
+            <label class="switch"><input type="checkbox" checked> Зерно плёнки</label>
+            <label class="switch"><input type="checkbox"> Тёмная подложка</label>
+            <div class="check-row">
+              <label><input type="checkbox" checked> Семантика</label>
+              <label><input type="radio" name="r" checked> CSS</label>
+              <label><input type="radio" name="r"> JS</label>
+            </div>
+          </div>
+        </div>
+        <div class="plate comp reveal"><h3>Индикаторы</h3>
+          <div class="plate-body">
+            <div class="row"><span class="tagc ok">Стабильно</span><span class="tagc warn">В работе</span><span class="tagc err">Сломано</span><span class="tagc info">Инфо</span></div>
+            <div class="bar-track" role="progressbar" aria-valuenow="62" aria-valuemin="0" aria-valuemax="100" aria-label="Прогресс сборки"><i></i></div>
+          </div>
+        </div>
+        <div class="plate comp reveal" style="--i:1"><h3>Сообщение</h3>
+          <div class="plate-body">
+            <div class="alert"><b>Заметка на полях</b>Каждая секция каркаса самодостаточна: её можно удалить, продублировать или переставить без последствий для остальных.</div>
+          </div>
+        </div>
+        <div class="plate comp reveal" style="--i:2"><h3>Параметры</h3>
+          <div class="plate-body def">
+            <div class="dr"><span>Кодировка</span>UTF-8</div>
+            <div class="dr"><span>Шрифтов</span>3 семейства</div>
+            <div class="dr"><span>Скруглений</span>0 px</div>
+            <div class="dr"><span>Сетка</span>12 колонок</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="modules" data-xray="СЕКЦИЯ 05 · section">
+    <div class="wrap">
+      <header class="sec-head">
+        <span class="sec-index">05</span>
+        <h2 class="sec-title" data-scramble>JS-модули каркаса</h2>
+        <span class="sec-meta">чистый javascript · шина событий</span>
+      </header>
+      <div class="mod-grid">
+        <div class="reveal">
+          <div class="mod"><span class="mn">clock</span><span class="md">Живое время в паспорте чертежа</span><span class="st">жив</span></div>
+          <div class="mod"><span class="mn">scramble</span><span class="md">Посимвольная расшифровка заголовков</span><span class="st">жив</span></div>
+          <div class="mod"><span class="mn">reveal</span><span class="md">Появление блоков по скроллу</span><span class="st">жив</span></div>
+          <div class="mod"><span class="mn">bus</span><span class="md">Событийная шина между модулями</span><span class="st">жив</span></div>
+          <div class="mod"><span class="mn">firebase</span><span class="md">Облачная авторизация и база пользователей</span><span class="st">жив</span></div>
+          <div class="mod"><span class="mn">xray</span><span class="md">Подсветка слоёв структуры</span><span class="st">жив</span></div>
+          <div class="mod"><span class="mn">tokens</span><span class="md">Копирование значений в буфер</span><span class="st">жив</span></div>
+          <div class="mod"><span class="mn">playground</span><span class="md">Интерактивная сетка</span><span class="st">жив</span></div>
+          <div class="mod"><span class="mn">scrollspy</span><span class="md">Активный пункт меню</span><span class="st">жив</span></div>
+          <div class="mod"><span class="mn">hotkeys</span><span class="md">Клавиши G · X · T</span><span class="st">жив</span></div>
+          <div class="mod"><span class="mn">theme</span><span class="md">Светлая / тёмная схема</span><span class="st">жив</span></div>
+        </div>
+        <div class="term reveal" style="--i:1">
+          <div class="term-head"><span class="dot"></span> Журнал событий <span class="cnt" id="logCount">000</span></div>
+          <div class="term-body">
+            <ul id="busLog" aria-live="polite"></ul>
+            <div class="term-actions">
+              <button class="btn" id="btnPing">Пульс</button>
+              <button class="btn" id="btnClear">Очистить</button>
+            </div>
+            <p class="term-hint">Все действия на странице проходят через Bus. Попробуйте зарегистрироваться!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="log" data-xray="СЕКЦИЯ 06 · section">
+    <div class="wrap">
+      <header class="sec-head">
+        <span class="sec-index">06</span>
+        <h2 class="sec-title" data-scramble>Журнал сборки</h2>
+        <span class="sec-meta">история версий</span>
+      </header>
+      <div class="timeline">
+        <div class="tl-item reveal"><span class="tl-ver">v0.5.0</span><div class="tl-date">24.11.2026 · firebase auth</div><p>Полноценная облачная авторизация: регистрация по email, отправка писем подтверждения, безопасное хранение в Firebase.</p></div>
+        <div class="tl-item reveal" style="--i:1"><span class="tl-ver">v0.4.0</span><div class="tl-date">23.11.2026 · аккаунты</div><p>Регистрация и вход: никнейм только буквы и цифры (RU/EN), пароль — любые символы двух алфавитов, хеширование пароля и локальная база в localStorage.</p></div>
+        <div class="tl-item reveal" style="--i:2"><span class="tl-ver">v0.3.0</span><div class="tl-date">23.11.2026 · интерактив</div><p>Рентген-режим, событийная шина, расшифровка заголовков, счётчики спецификации, горячие клавиши.</p></div>
+        <div class="tl-item reveal" style="--i:3"><span class="tl-ver">v0.2.0</span><div class="tl-date">21.11.2026 · дизайн-система</div><p>Токены цвета и типографики, полигон сетки, инвентарь компонентов, тёмная схема.</p></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot" id="foot" data-xray="ПОДВАЛ · footer">
+  <div class="wrap">
+    <div class="foot-word" aria-hidden="true">КАРКАС</div>
+    <div class="foot-grid">
+      <div class="reveal"><h4>Навигация</h4>
+        <ul>
+          <li><a href="#anatomy">01 · Анатомия</a></li>
+          <li><a href="#tokens">02 · Токены</a></li>
+          <li><a href="#gridlab">03 · Сетка</a></li>
+          <li><a href="#components">04 · Компоненты</a></li>
+          <li><a href="#modules">05 · Модули</a></li>
+          <li><a href="#log">06 · Журнал</a></li>
+        </ul>
+      </div>
+      <div class="reveal" style="--i:1"><h4>Горячие клавиши</h4>
+        <ul>
+          <li><span class="mono">G</span> — модульная сетка поверх листа</li>
+          <li><span class="mono">X</span> — рентген структуры</li>
+          <li><span class="mono">T</span> — переключение темы</li>
+        </ul>
+      </div>
+      <div class="reveal" style="--i:2"><h4>Колофон</h4>
+        <ul>
+          <li>Акциденция — Unbounded</li>
+          <li>Текст — IBM Plex Sans</li>
+          <li>Служебный — JetBrains Mono</li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-bar">
+      <span>© 2026 · Каркас-01</span>
+      <span>Лист 01/01</span>
+      <span>1 файл · Firebase Auth</span>
+      <button class="btn" id="toTop">Наверх ↑</button>
+    </div>
+  </div>
+</footer>
+
+<!-- МОДАЛЬНОЕ ОКНО АВТОРИЗАЦИИ -->
+<div class="modal" id="authModal" hidden>
+  <div class="modal-backdrop" data-close></div>
+  <div class="modal-plate" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+    <div class="modal-head">
+      <span id="authTitle">Аккаунт · Firebase Auth</span>
+      <button class="modal-x" data-close aria-label="Закрыть">✕</button>
+    </div>
+    <div class="modal-tabs" role="tablist">
+      <button type="button" id="tabLogin" class="tab on" role="tab" aria-selected="true">Вход</button>
+      <button type="button" id="tabReg" class="tab" role="tab" aria-selected="false">Регистрация</button>
+    </div>
+    <form id="authForm" novalidate>
+      <div class="field">
+        <label for="inEmail">Email</label>
+        <input id="inEmail" type="email" autocomplete="username" required placeholder="example@mail.com">
+        <p class="ferr" id="errEmail" hidden></p>
+      </div>
+      <div class="field">
+        <label for="inPass">Пароль</label>
+        <div class="pass-wrap">
+          <input id="inPass" type="password" autocomplete="current-password" minlength="6" required placeholder="Минимум 6 символов">
+          <button type="button" class="pass-eye" id="passEye" aria-label="Показать пароль">◉</button>
+        </div>
+        <p class="ferr" id="errPass" hidden></p>
+      </div>
+      <button class="btn primary submit" type="submit" id="authSubmit">Войти</button>
+      <p class="form-msg" id="formMsg" hidden></p>
+    </form>
+    <p class="modal-note">Данные хранятся в защищённой базе Firebase. Пароль хешируется. Email требует подтверждения по ссылке из письма.</p>
+  </div>
+</div>
+
+<div class="sheetgrid" aria-hidden="true"><div class="wrap"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+<div id="coords" aria-hidden="true">X 0000 · Y 0000</div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script type="module">
+// ============================================================
+// КАРКАС-01 · МОДУЛИ + FIREBASE AUTH
+// ============================================================
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { 
+  getAuth, createUserWithEmailAndPassword, sendEmailVerification, 
+  signInWithEmailAndPassword, signOut, onAuthStateChanged 
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+// ⚠️ ВСТАВЬТЕ СЮДА ВАШИ ДАННЫЕ ИЗ КОНСОЛИ FIREBASE!
+const firebaseConfig = {
+  apiKey: "AIzaSyDUysxoQKWm9bWQaO-4fT7rbmEYj-gr1z4",
+  authDomain: "karkas-url.firebaseapp.com",
+  projectId: "karkas-url",
+  storageBucket: "karkas-url.firebasestorage.app",
+  messagingSenderId: "483920712744",
+  appId: "1:483920712744:web:def6e7b11d05d1e48f911d"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+const $ = (s, c = document) => c.querySelector(s);
+const $$ = (s, c = document) => [...c.querySelectorAll(s)];
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ---------- шина событий ---------- */
+const Bus = { m: new Map(), on(e, f){ if(!this.m.has(e)) this.m.set(e,[]); this.m.get(e).push(f); }, emit(e, d){ (this.m.get(e)||[]).forEach(f=>f(d)); } };
+window.Bus = Bus;
+
+const logEl = $('#busLog'), logCount = $('#logCount');
+let logN = 0;
+function log(msg, type = 'sys'){
+  logN++;
+  const li = document.createElement('li');
+  li.innerHTML = `<span class="t">${new Date().toLocaleTimeString('ru-RU')}</span><span class="m ${type}">${msg}</span>`;
+  logEl.prepend(li);
+  while (logEl.children.length > 12) logEl.lastChild.remove();
+  logCount.textContent = String(logN).padStart(3, '0');
+}
+Bus.on('log', ({ msg, type }) => log(msg, type));
+
+const toastEl = $('#toast'); let toastT;
+function toast(msg){ toastEl.textContent = msg; toastEl.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => toastEl.classList.remove('show'), 2500); }
+
+/* ---------- clock ---------- */
+const clockEl = $('#clock');
+const tickClock = () => { const d = new Date(); clockEl.textContent = d.toLocaleDateString('ru-RU') + ' · ' + d.toLocaleTimeString('ru-RU'); };
+tickClock(); setInterval(tickClock, 1000);
+
+/* ---------- theme ---------- */
+const root = document.documentElement, btnTheme = $('#ctlTheme');
+btnTheme.addEventListener('click', () => {
+  const dark = root.dataset.theme === 'dark';
+  root.dataset.theme = dark ? 'light' : 'dark';
+  btnTheme.setAttribute('aria-pressed', String(!dark));
+  btnTheme.classList.toggle('on', !dark);
+  Bus.emit('log', { msg: `тема → ${dark ? 'светлая' : 'тёмная'}` });
+});
+
+/* ---------- xray & grid ---------- */
+const btnX = $('#ctlXray'), btnG = $('#ctlGrid');
+function setXray(on){ document.body.classList.toggle('xray', on); btnX.setAttribute('aria-pressed', String(on)); btnX.classList.toggle('on', on); Bus.emit('log', { msg: `рентген → ${on ? 'вкл' : 'выкл'}` }); }
+btnX.addEventListener('click', () => setXray(!document.body.classList.contains('xray')));
+$('#anatomyXray').addEventListener('click', () => setXray(true));
+$('#heroXray').addEventListener('click', () => { setXray(true); $('#anatomy').scrollIntoView({ behavior: RM ? 'auto' : 'smooth' }); });
+btnG.addEventListener('click', () => { const on = document.body.classList.toggle('show-grid'); btnG.setAttribute('aria-pressed', String(on)); btnG.classList.toggle('on', on); });
+
+/* ---------- FIREBASE AUTH ЛОГИКА ---------- */
+const authModal = $('#authModal'), authForm = $('#authForm');
+const inEmail = $('#inEmail'), inPass = $('#inPass');
+const errEmail = $('#errEmail'), errPass = $('#errPass');
+const tabLogin = $('#tabLogin'), tabReg = $('#tabReg');
+const authSubmit = $('#authSubmit'), formMsg = $('#formMsg');
+let authMode = 'login';
+
+function setFieldErr(input, errEl, text){
+  if (text){ errEl.textContent = text; errEl.hidden = false; input.classList.add('err-input'); }
+  else { errEl.hidden = true; input.classList.remove('err-input'); }
+}
+function showFormMsg(text, ok){
+  if (!text){ formMsg.hidden = true; return; }
+  formMsg.hidden = false; formMsg.textContent = text; formMsg.className = 'form-msg ' + (ok ? 'ok' : 'bad');
+}
+function clearErrors(){ setFieldErr(inEmail, errEmail, ''); setFieldErr(inPass, errPass, ''); }
+
+function setMode(mode){
+  authMode = mode;
+  tabLogin.classList.toggle('on', mode === 'login');
+  tabReg.classList.toggle('on', mode === 'register');
+  tabLogin.setAttribute('aria-selected', String(mode === 'login'));
+  tabReg.setAttribute('aria-selected', String(mode === 'register'));
+  authSubmit.textContent = mode === 'login' ? 'Войти' : 'Зарегистрироваться';
+  inPass.autocomplete = mode === 'login' ? 'current-password' : 'new-password';
+  showFormMsg(''); clearErrors();
+}
+function openAuth(){ authModal.hidden = false; document.body.style.overflow = 'hidden'; setMode(authMode); setTimeout(() => inEmail.focus(), 50); }
+function closeAuth(){ authModal.hidden = true; document.body.style.overflow = ''; authForm.reset(); showFormMsg(''); clearErrors(); }
+
+const authLogout = $('#authLogout'), userChip = $('#userChip'), userNameEl = $('#userName'), operatorEl = $('#operator');
+function renderAuthState(user){
+  if (user){
+    $('#authOpen').hidden = true; userChip.hidden = false; authLogout.hidden = false;
+    userNameEl.textContent = user.email;
+    operatorEl.textContent = user.emailVerified ? 'Подтвержден' : 'Не подтвержден';
+    operatorEl.style.color = user.emailVerified ? 'var(--green)' : 'var(--red)';
+  } else {
+    $('#authOpen').hidden = false; userChip.hidden = true; authLogout.hidden = true;
+    operatorEl.textContent = '—'; operatorEl.style.color = 'inherit';
+  }
+}
+
+authForm.addEventListener('submit', async e => {
+  e.preventDefault();
+  const email = inEmail.value.trim();
+  const pass = inPass.value;
+  let bad = false;
+  
+  if (!email.includes('@')) { setFieldErr(inEmail, errEmail, 'Введите корректный email'); bad = true; }
+  if (pass.length < 6) { setFieldErr(inPass, errPass, 'Минимум 6 символов'); bad = true; }
+  if (bad) return;
+
+  authSubmit.disabled = true; authSubmit.textContent = 'Обработка...';
+  try {
+    if (authMode === 'register') {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+      await sendEmailVerification(userCredential.user);
+      toast('Аккаунт создан! Проверьте почту для подтверждения.');
+      Bus.emit('log', { msg: `Регистрация: ${email} (ожидает подтверждения)`, type: 'ok' });
+      closeAuth();
+    } else {
+      const userCredential = await signInWithEmailAndPassword(auth, email, pass);
+      if (!userCredential.user.emailVerified) {
+        showFormMsg('Ошибка: Email не подтвержден. Проверьте почту.', false);
+        Bus.emit('log', { msg: `Ошибка входа: ${email} (email не подтвержден)`, type: 'err' });
+        return;
+      }
+      toast('Добро пожаловать, ' + userCredential.user.email);
+      Bus.emit('log', { msg: `Успешный вход: ${userCredential.user.email}`, type: 'ok' });
+      closeAuth();
+    }
+  } catch (error) {
+    console.error(error);
+    let msg = 'Произошла ошибка';
+    if (error.code === 'auth/email-already-in-use') msg = 'Этот email уже зарегистрирован';
+    if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') msg = 'Неверный email или пароль';
+    if (error.code === 'auth/weak-password') msg = 'Пароль слишком слабый (мин. 6 символов)';
+    showFormMsg(msg, false);
+  } finally {
+    authSubmit.disabled = false;
+    authSubmit.textContent = authMode === 'login' ? 'Войти' : 'Зарегистрироваться';
+  }
+});
+
+onAuthStateChanged(auth, (user) => { renderAuthState(user); });
+
+$('#authOpen').addEventListener('click', openAuth);
+$('#heroAuth').addEventListener('click', openAuth);
+$('#authLogout').addEventListener('click', async () => {
+  await signOut(auth);
+  toast('Вы вышли из системы');
+  Bus.emit('log', { msg: 'Выход из системы' });
+});
+$$('[data-close]', authModal).forEach(el => el.addEventListener('click', closeAuth));
+$('#tabLogin').addEventListener('click', () => setMode('login'));
+$('#tabReg').addEventListener('click', () => setMode('register'));
+
+const passEye = $('#passEye');
+passEye.addEventListener('click', () => {
+  const show = inPass.type === 'password';
+  inPass.type = show ? 'text' : 'password';
+  passEye.textContent = show ? '◎' : '◉';
+  passEye.classList.toggle('on', show);
+});
+[inEmail, inPass].forEach(inp => inp.addEventListener('input', () => { clearErrors(); showFormMsg(''); }));
+
+/* ---------- hotkeys ---------- */
+addEventListener('keydown', e => {
+  if (!authModal.hidden){ if (e.key === 'Escape') closeAuth(); return; }
+  if (e.target.matches('input, textarea, select') || e.metaKey || e.ctrlKey) return;
+  const k = e.key.toLowerCase();
+  if (k === 'g') btnG.click();
+  if (k === 'x') btnX.click();
+  if (k === 't') btnTheme.click();
+});
+
+/* ---------- анатомия, scramble, reveal, counters, scrollspy, coords, tokens, playground, demo ---------- */
+$$('.layer').forEach(row => {
+  const t = $(row.dataset.target); if (!t) return;
+  const on = () => t.classList.add('xr-hover'), off = () => t.classList.remove('xr-hover');
+  row.addEventListener('mouseenter', on); row.addEventListener('mouseleave', off);
+  row.addEventListener('focus', on); row.addEventListener('blur', off);
+});
+
+const GLYPHS = '█▓▒░<>/#КРКС01';
+function scramble(el){
+  const txt = el.dataset.text ?? el.textContent; el.dataset.text = txt;
+  if (RM) { el.textContent = txt; return; }
+  let f = 0; const total = Math.max(16, txt.length * 3);
+  const id = setInterval(() => {
+    f++; const cut = Math.floor(f / total * txt.length);
+    el.textContent = txt.split('').map((c, i) => c === ' ' ? ' ' : (i < cut ? c : GLYPHS[Math.random() * GLYPHS.length | 0])).join('');
+    if (f >= total) { el.textContent = txt; clearInterval(id); }
+  }, 28);
+}
+const io = new IntersectionObserver(entries => {
+  entries.forEach(en => {
+    if (!en.isIntersecting) return;
+    const el = en.target; el.matches('[data-scramble]') ? scramble(el) : el.classList.add('in');
+    io.unobserve(el);
+  });
+}, { threshold: .15 });
+$$('.reveal, [data-scramble]').forEach(el => io.observe(el));
+
+const cio = new IntersectionObserver(entries => {
+  entries.forEach(en => {
+    if (!en.isIntersecting) return;
+    const el = en.target, to = +el.dataset.to, pad = +(el.dataset.pad || 0);
+    const fmt = v => String(v).padStart(pad, '0');
+    if (RM) { el.textContent = fmt(to); cio.unobserve(el); return; }
+    const t0 = performance.now(), D = 900;
+    (function step(t){ const p = Math.min(1, (t - t0) / D); el.textContent = fmt(Math.round(to * p)); if (p < 1) requestAnimationFrame(step); })(t0);
+    cio.unobserve(el);
+  });
+}, { threshold: .6 });
+$$('.count').forEach(el => cio.observe(el));
+
+const spy = new IntersectionObserver(entries => {
+  entries.forEach(en => {
+    if (!en.isIntersecting) return;
+    $$('#navLinks a').forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + en.target.id));
+  });
+}, { rootMargin: '-45% 0px -50% 0px' });
+$$('main section[id]').forEach(s => spy.observe(s));
+
+const coords = $('#coords'); let cx = 0, cy = 0, queued = false;
+addEventListener('mousemove', e => {
+  cx = e.clientX; cy = e.clientY;
+  if (queued) return; queued = true;
+  requestAnimationFrame(() => { coords.textContent = `X ${String(cx).padStart(4,'0')} · Y ${String(cy).padStart(4,'0')}`; queued = false; });
+});
+
+$$('.swatch').forEach(sw => sw.addEventListener('click', async () => {
+  const hex = sw.dataset.hex;
+  try { await navigator.clipboard.writeText(hex); } catch (_) {
+    const ta = document.createElement('textarea'); ta.value = hex; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+  }
+  toast('Скопировано: ' + hex); Bus.emit('log', { msg: `токен ${hex} скопирован`, type: 'ok' });
+}));
+
+const colsIn = $('#cols'), gapIn = $('#gap'), stage = $('#stage'), out = $('#stageOut');
+function renderStage(){
+  const n = +colsIn.value, g = +gapIn.value;
+  stage.style.gridTemplateColumns = `repeat(${n}, 1fr)`; stage.style.gap = g + 'px';
+  stage.innerHTML = Array.from({ length: n }, (_, i) => `<div class="col" style="animation-delay:${i * 30}ms"><span>${String(i + 1).padStart(2,'0')}</span></div>`).join('');
+  out.textContent = `КОЛОНОК: ${String(n).padStart(2,'0')} · ОТСТУП: ${g}PX`;
+}
+colsIn.addEventListener('input', renderStage); gapIn.addEventListener('input', renderStage); renderStage();
+
+$('#btnPing').addEventListener('click', () => Bus.emit('log', { msg: `ping → pong · ${8 + (Math.random() * 40 | 0)} мс`, type: 'ok' }));
+$('#btnClear').addEventListener('click', () => { logEl.innerHTML = ''; logN = 0; logCount.textContent = '000'; });
+$('#toTop').addEventListener('click', () => scrollTo({ top: 0, behavior: RM ? 'auto' : 'smooth' }));
+
+Bus.emit('log', { msg: 'каркас собран · Firebase Auth инициализирован', type: 'ok' });
+</script>
+</body>
+</html>
