@@ -10,18 +10,8 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;700&family=Unbounded:wght@400;700;900&display=swap" rel="stylesheet">
 
 <style>
-/* ============================================================
-   КАРКАС-01 · СТИЛИ (ПОЛНАЯ ВЕРСИЯ)
-   ============================================================ */
-:root{
-  --paper:#F1EFE7; --paper-2:#E9E6DA; --ink:#181611; --ink-2:#5B574B;
-  --line:#C9C4B4; --accent:#FF4A00; --blue:#2547E8; --green:#1E7A46; --red:#C22F2F;
-  --font-d:'Unbounded',sans-serif; --font-b:'IBM Plex Sans',sans-serif; --font-m:'JetBrains Mono',monospace;
-  --sheet:min(1200px,92vw); --nav-h:60px;
-}
-html[data-theme="dark"]{
-  --paper:#14130F; --paper-2:#1C1B15; --ink:#EAE6DA; --ink-2:#9B968A; --line:#34322A; --accent:#FF5A1A;
-}
+:root{--paper:#F1EFE7;--paper-2:#E9E6DA;--ink:#181611;--ink-2:#5B574B;--line:#C9C4B4;--accent:#FF4A00;--blue:#2547E8;--green:#1E7A46;--red:#C22F2F;--font-d:'Unbounded',sans-serif;--font-b:'IBM Plex Sans',sans-serif;--font-m:'JetBrains Mono',monospace;--sheet:min(1200px,92vw);--nav-h:60px}
+html[data-theme="dark"]{--paper:#14130F;--paper-2:#1C1B15;--ink:#EAE6DA;--ink-2:#9B968A;--line:#34322A;--accent:#FF5A1A}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth;color-scheme:light}
 html[data-theme="dark"]{color-scheme:dark}
@@ -213,7 +203,6 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:0;backg
 .reveal{opacity:0;transform:translateY(26px);transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1);transition-delay:calc(var(--i,0)*70ms)}
 .reveal.in{opacity:1;transform:none}
 
-/* МОДАЛЬНОЕ ОКНО АВТОРИЗАЦИИ */
 .modal{position:fixed;inset:0;z-index:300;display:grid;place-items:center;padding:20px}
 .modal[hidden]{display:none}
 .modal-backdrop{position:absolute;inset:0;background:color-mix(in srgb,var(--ink) 62%,transparent)}
@@ -266,7 +255,7 @@ body.show-grid .sheetgrid{display:block}
 <header class="titleblock" id="passport" data-xray="ПАСПОРТ · header">
   <div class="wrap tb-grid">
     <div class="tb-cell">Проект <b>КАРКАС-01</b></div>
-    <div class="tb-cell">Версия <b>0.5.0 (Firebase)</b></div>
+    <div class="tb-cell">Версия <b>0.5.1 (Firebase)</b></div>
     <div class="tb-cell">Масштаб <b>1 : 1</b></div>
     <div class="tb-cell">Лист <b>01 / 01</b></div>
     <div class="tb-cell">Дата <b id="clock">—</b></div>
@@ -514,10 +503,10 @@ body.show-grid .sheetgrid{display:block}
         <span class="sec-meta">история версий</span>
       </header>
       <div class="timeline">
-        <div class="tl-item reveal"><span class="tl-ver">v0.5.0</span><div class="tl-date">24.11.2026 · firebase auth</div><p>Полноценная облачная авторизация: регистрация по email, отправка писем подтверждения, безопасное хранение в Firebase.</p></div>
-        <div class="tl-item reveal" style="--i:1"><span class="tl-ver">v0.4.0</span><div class="tl-date">23.11.2026 · аккаунты</div><p>Регистрация и вход: никнейм только буквы и цифры (RU/EN), пароль — любые символы двух алфавитов, хеширование пароля и локальная база в localStorage.</p></div>
-        <div class="tl-item reveal" style="--i:2"><span class="tl-ver">v0.3.0</span><div class="tl-date">23.11.2026 · интерактив</div><p>Рентген-режим, событийная шина, расшифровка заголовков, счётчики спецификации, горячие клавиши.</p></div>
-        <div class="tl-item reveal" style="--i:3"><span class="tl-ver">v0.2.0</span><div class="tl-date">21.11.2026 · дизайн-система</div><p>Токены цвета и типографики, полигон сетки, инвентарь компонентов, тёмная схема.</p></div>
+        <div class="tl-item reveal"><span class="tl-ver">v0.5.1</span><div class="tl-date">24.11.2026 · исправления</div><p>Email обрезается до @, состояние оператора корректное, кнопка повторной отправки письма.</p></div>
+        <div class="tl-item reveal" style="--i:1"><span class="tl-ver">v0.5.0</span><div class="tl-date">24.11.2026 · firebase auth</div><p>Полноценная облачная авторизация: регистрация по email, отправка писем подтверждения, безопасное хранение в Firebase.</p></div>
+        <div class="tl-item reveal" style="--i:2"><span class="tl-ver">v0.4.0</span><div class="tl-date">23.11.2026 · аккаунты</div><p>Регистрация и вход: никнейм только буквы и цифры (RU/EN), пароль — любые символы двух алфавитов, хеширование пароля и локальная база в localStorage.</p></div>
+        <div class="tl-item reveal" style="--i:3"><span class="tl-ver">v0.3.0</span><div class="tl-date">23.11.2026 · интерактив</div><p>Рентген-режим, событийная шина, расшифровка заголовков, счётчики спецификации, горячие клавиши.</p></div>
       </div>
     </div>
   </section>
@@ -561,7 +550,6 @@ body.show-grid .sheetgrid{display:block}
   </div>
 </footer>
 
-<!-- МОДАЛЬНОЕ ОКНО АВТОРИЗАЦИИ -->
 <div class="modal" id="authModal" hidden>
   <div class="modal-backdrop" data-close></div>
   <div class="modal-plate" role="dialog" aria-modal="true" aria-labelledby="authTitle">
@@ -599,9 +587,6 @@ body.show-grid .sheetgrid{display:block}
 <div id="toast" role="status" aria-live="polite"></div>
 
 <script type="module">
-// ============================================================
-// КАРКАС-01 · МОДУЛИ + FIREBASE AUTH
-// ============================================================
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { 
   getAuth, createUserWithEmailAndPassword, sendEmailVerification, 
@@ -610,12 +595,12 @@ import {
 
 // ⚠️ ВСТАВЬТЕ СЮДА ВАШИ ДАННЫЕ ИЗ КОНСОЛИ FIREBASE!
 const firebaseConfig = {
-  apiKey: "AIzaSyDUysxoQKWm9bWQaO-4fT7rbmEYj-gr1z4",
-  authDomain: "karkas-url.firebaseapp.com",
-  projectId: "karkas-url",
-  storageBucket: "karkas-url.firebasestorage.app",
-  messagingSenderId: "483920712744",
-  appId: "1:483920712744:web:def6e7b11d05d1e48f911d"
+  apiKey: "ВСТАВЬТЕ_СЮДА_ВАШ_API_KEY",
+  authDomain: "ВАШ_ПРОЕКТ.firebaseapp.com",
+  projectId: "ВАШ_ПРОЕКТ",
+  storageBucket: "ВАШ_ПРОЕКТ.appspot.com",
+  messagingSenderId: "ВАШ_ID",
+  appId: "ВАШ_APP_ID"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -625,7 +610,6 @@ const $ = (s, c = document) => c.querySelector(s);
 const $$ = (s, c = document) => [...c.querySelectorAll(s)];
 const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-/* ---------- шина событий ---------- */
 const Bus = { m: new Map(), on(e, f){ if(!this.m.has(e)) this.m.set(e,[]); this.m.get(e).push(f); }, emit(e, d){ (this.m.get(e)||[]).forEach(f=>f(d)); } };
 window.Bus = Bus;
 
@@ -644,12 +628,10 @@ Bus.on('log', ({ msg, type }) => log(msg, type));
 const toastEl = $('#toast'); let toastT;
 function toast(msg){ toastEl.textContent = msg; toastEl.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => toastEl.classList.remove('show'), 2500); }
 
-/* ---------- clock ---------- */
 const clockEl = $('#clock');
 const tickClock = () => { const d = new Date(); clockEl.textContent = d.toLocaleDateString('ru-RU') + ' · ' + d.toLocaleTimeString('ru-RU'); };
 tickClock(); setInterval(tickClock, 1000);
 
-/* ---------- theme ---------- */
 const root = document.documentElement, btnTheme = $('#ctlTheme');
 btnTheme.addEventListener('click', () => {
   const dark = root.dataset.theme === 'dark';
@@ -659,7 +641,6 @@ btnTheme.addEventListener('click', () => {
   Bus.emit('log', { msg: `тема → ${dark ? 'светлая' : 'тёмная'}` });
 });
 
-/* ---------- xray & grid ---------- */
 const btnX = $('#ctlXray'), btnG = $('#ctlGrid');
 function setXray(on){ document.body.classList.toggle('xray', on); btnX.setAttribute('aria-pressed', String(on)); btnX.classList.toggle('on', on); Bus.emit('log', { msg: `рентген → ${on ? 'вкл' : 'выкл'}` }); }
 btnX.addEventListener('click', () => setXray(!document.body.classList.contains('xray')));
@@ -667,7 +648,6 @@ $('#anatomyXray').addEventListener('click', () => setXray(true));
 $('#heroXray').addEventListener('click', () => { setXray(true); $('#anatomy').scrollIntoView({ behavior: RM ? 'auto' : 'smooth' }); });
 btnG.addEventListener('click', () => { const on = document.body.classList.toggle('show-grid'); btnG.setAttribute('aria-pressed', String(on)); btnG.classList.toggle('on', on); });
 
-/* ---------- FIREBASE AUTH ЛОГИКА ---------- */
 const authModal = $('#authModal'), authForm = $('#authForm');
 const inEmail = $('#inEmail'), inPass = $('#inPass');
 const errEmail = $('#errEmail'), errPass = $('#errPass');
@@ -699,15 +679,33 @@ function openAuth(){ authModal.hidden = false; document.body.style.overflow = 'h
 function closeAuth(){ authModal.hidden = true; document.body.style.overflow = ''; authForm.reset(); showFormMsg(''); clearErrors(); }
 
 const authLogout = $('#authLogout'), userChip = $('#userChip'), userNameEl = $('#userName'), operatorEl = $('#operator');
+
 function renderAuthState(user){
-  if (user){
-    $('#authOpen').hidden = true; userChip.hidden = false; authLogout.hidden = false;
-    userNameEl.textContent = user.email;
-    operatorEl.textContent = user.emailVerified ? 'Подтвержден' : 'Не подтвержден';
-    operatorEl.style.color = user.emailVerified ? 'var(--green)' : 'var(--red)';
+  // Если email не подтверждён — считаем пользователя "не вошедшим"
+  if (user && user.emailVerified){
+    $('#authOpen').hidden = true; 
+    userChip.hidden = false; 
+    authLogout.hidden = false;
+    
+    // Обрезаем email до символа @
+    const displayName = user.email.split('@')[0];
+    userNameEl.textContent = displayName;
+    operatorEl.textContent = displayName;
+    operatorEl.style.color = 'var(--green)';
   } else {
-    $('#authOpen').hidden = false; userChip.hidden = true; authLogout.hidden = true;
-    operatorEl.textContent = '—'; operatorEl.style.color = 'inherit';
+    // Пользователь не вошёл или email не подтверждён
+    if (user && !user.emailVerified){
+      // Автоматически выходим, если email не подтверждён
+      signOut(auth);
+      toast('Email не подтверждён. Проверьте почту.');
+      Bus.emit('log', { msg: `Автовыход: ${user.email} (email не подтверждён)`, type: 'warn' });
+    }
+    
+    $('#authOpen').hidden = false; 
+    userChip.hidden = true; 
+    authLogout.hidden = true;
+    operatorEl.textContent = '—'; 
+    operatorEl.style.color = 'inherit';
   }
 }
 
@@ -732,11 +730,15 @@ authForm.addEventListener('submit', async e => {
     } else {
       const userCredential = await signInWithEmailAndPassword(auth, email, pass);
       if (!userCredential.user.emailVerified) {
-        showFormMsg('Ошибка: Email не подтвержден. Проверьте почту.', false);
-        Bus.emit('log', { msg: `Ошибка входа: ${email} (email не подтвержден)`, type: 'err' });
+        // Предлагаем отправить письмо повторно
+        showFormMsg('Email не подтверждён. Проверьте почту или отправьте письмо повторно.', false);
+        Bus.emit('log', { msg: `Ошибка входа: ${email} (email не подтверждён)`, type: 'err' });
+        
+        // Автоматически выходим
+        await signOut(auth);
         return;
       }
-      toast('Добро пожаловать, ' + userCredential.user.email);
+      toast('Добро пожаловать, ' + userCredential.user.email.split('@')[0]);
       Bus.emit('log', { msg: `Успешный вход: ${userCredential.user.email}`, type: 'ok' });
       closeAuth();
     }
@@ -775,7 +777,6 @@ passEye.addEventListener('click', () => {
 });
 [inEmail, inPass].forEach(inp => inp.addEventListener('input', () => { clearErrors(); showFormMsg(''); }));
 
-/* ---------- hotkeys ---------- */
 addEventListener('keydown', e => {
   if (!authModal.hidden){ if (e.key === 'Escape') closeAuth(); return; }
   if (e.target.matches('input, textarea, select') || e.metaKey || e.ctrlKey) return;
@@ -785,7 +786,6 @@ addEventListener('keydown', e => {
   if (k === 't') btnTheme.click();
 });
 
-/* ---------- анатомия, scramble, reveal, counters, scrollspy, coords, tokens, playground, demo ---------- */
 $$('.layer').forEach(row => {
   const t = $(row.dataset.target); if (!t) return;
   const on = () => t.classList.add('xr-hover'), off = () => t.classList.remove('xr-hover');
